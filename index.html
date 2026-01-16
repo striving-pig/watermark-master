@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watermark Master Pro - 专业批量加水印</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --radius: 12px;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styling */
+header {
+    background: #0f172a;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header h1 svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary);
+}
+
+/* Layout Grid */
+.app-container {
+    display: grid;
+    grid-template-columns: 320px 1fr 340px;
+    gap: 1rem;
+    padding: 1rem;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.sidebar h2 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Form Controls */
+.control-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Range Input Styling */
+.range-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+input[type="range"] {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    appearance: none;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+}
+
+.value-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--bg-main);
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+}
+
+/* Fieldset Styling */
+fieldset {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 0 0 1rem 0;
+    background: #f8fafc;
+}
+
+legend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 0 8px;
+}
+
+/* Button Styling */
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: white;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #f8fafc;
+    border-color: var(--text-muted);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Canvas Area */
+.canvas-editor {
+    display: flex;
+    flex-direction: column;
+    background: #e2e8f0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.canvas-toolbar {
+    background: white;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.canvas-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow: hidden;
+}
+
+#watermarkCanvas {
+    max-width: 100%;
+    max-height: 100%;
+    background: #fff;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    border-radius: 4px;
+    cursor: crosshair;
+}
+
+#watermarkCanvas.dragging {
+    cursor: grabbing;
+}
+
+/* Thumbnail List */
+.image-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 8px;
+    margin-top: 1rem;
+}
+
+.thumbnail-item {
+    aspect-ratio: 1/1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #eee;
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail-item.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Watermark Type Selector */
+.type-selector {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.type-selector label {
+    flex: 1;
+    margin: 0;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.type-selector input {
+    display: none;
+}
+
+.type-selector label:has(input:checked) {
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+/* Image Preview Box */
+.image-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #f8fafc;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.image-preview img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .app-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    .canvas-editor { grid-column: span 2; order: -1; height: 50vh; }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-columns: 1fr;
+    }
+    .canvas-editor { grid-column: auto; height: 40vh; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        Watermark Master Pro
+    </h1>
+    <div style="font-size: 0.75rem; opacity: 0.8;">V2.0 Professional Edition</div>
+</header>
+
+<div class="app-container">
+    <!-- Left Sidebar: Assets -->
+    <aside class="sidebar resources">
+        <h2>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            待处理图片
+        </h2>
+        <div class="control-group">
+            <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;">
+            <button class="btn-secondary" style="width: 100%;" onclick="document.getElementById('imageUpload').click()">
+                批量上传图片
+            </button>
+            <div id="uploadedImages" class="image-thumbnails">
+                <!-- JS Inserted -->
+            </div>
+        </div>
+
+        <h2 style="margin-top: 1rem;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            配置预设
+        </h2>
+        <div class="control-group">
+            <select id="presetSelect" style="margin-bottom: 0.5rem;">
+                <option value="">-- 选择已有预设 --</option>
+            </select>
+            <button id="applyPresetBtn" class="btn-secondary" style="width: 100%;" disabled>应用预设</button>
+            <button id="savePresetBtn" class="btn-secondary" style="width: 100%;">存为新预设</button>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button id="exportAllBtn" class="btn-primary" disabled>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                开始批量导出
+            </button>
+        </div>
+    </aside>
+
+    <!-- Center: Preview -->
+    <section class="canvas-editor">
+        <div class="canvas-toolbar">
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">实时编辑预览</span>
+            <span style="font-size: 0.7rem; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">按住左键拖动水印</span>
+        </div>
+        <div class="canvas-wrapper">
+            <canvas id="watermarkCanvas"></canvas>
+        </div>
+    </section>
+
+    <!-- Right Sidebar: Settings -->
+    <aside class="sidebar settings">
+        <h2>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            水印参数设置
+        </h2>
+        
+        <div class="type-selector">
+            <label><input type="radio" name="watermarkType" value="text" checked> 文字水印</label>
+            <label><input type="radio" name="watermarkType" value="image"> 图片水印</label>
+        </div>
+
+        <fieldset id="textWatermarkOptions">
+            <legend>文字属性</legend>
+            <label>水印内容</label>
+            <input type="text" id="watermarkText" value="Watermark Master">
+
+            <label style="margin-top: 1rem;">字体族</label>
+            <select id="fontSelect">
+                <option value="'Inter', sans-serif">Inter (默认)</option>
+                <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="Microsoft YaHei, sans-serif">微软雅黑</option>
+            </select>
+
+            <label style="margin-top: 1rem;">基本大小</label>
+            <div class="range-container">
+                <input type="range" id="fontSize" min="10" max="200" value="40">
+                <span class="value-badge" id="fontSizeValue">40px</span>
+            </div>
+
+            <label style="margin-top: 1rem;">填充颜色</label>
+            <input type="color" id="fontColor" value="#ffffff" style="height: 38px; border: none; padding: 2px;">
+        </fieldset>
+
+        <fieldset id="imageWatermarkOptions" style="display: none;">
+            <legend>图像属性</legend>
+            <label>上传水印图</label>
+            <input type="file" id="watermarkImageUpload" accept="image/*">
+            <div id="watermarkImagePreview" class="image-preview"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>通用调整</legend>
+            <label>透明度</label>
+            <div class="range-container">
+                <input type="range" id="opacitySlider" min="0" max="1" step="0.01" value="0.5">
+                <span class="value-badge" id="opacityValue">50%</span>
+            </div>
+
+            <label style="margin-top: 1rem;">缩放比例</label>
+            <div class="range-container">
+                <input type="range" id="sizeSlider" min="0.1" max="5" step="0.1" value="1">
+                <span class="value-badge" id="sizeValue">100%</span>
+            </div>
+
+            <label style="margin-top: 1rem;">旋转角度</label>
+            <div class="range-container">
+                <input type="range" id="rotationSlider" min="0" max="360" value="0">
+                <span class="value-badge" id="rotationValue">0°</span>
+            </div>
+
+            <label style="margin-top: 1rem;">水平位置 (X)</label>
+            <div class="range-container">
+                <input type="range" id="positionXSlider" min="0" max="100" value="50">
+                <span class="value-badge" id="positionXValue">50%</span>
+            </div>
+
+            <label style="margin-top: 1rem;">垂直位置 (Y)</label>
+            <div class="range-container">
+                <input type="range" id="positionYSlider" min="0" max="100" value="50">
+                <span class="value-badge" id="positionYValue">50%</span>
+            </div>
+        </fieldset>
+    </aside>
+</div>
+
+<script>
+    /* 保持原有逻辑完全不变，仅适配新 DOM 结构的交互逻辑 
+       (主要包括一些 CSS 相关的 class 切换)
+    */
+
+    // --- DOM Elements ---
+    const imageUploadInput = document.getElementById('imageUpload');
+    const uploadedImagesContainer = document.getElementById('uploadedImages');
+    const watermarkCanvas = document.getElementById('watermarkCanvas');
+    const ctx = watermarkCanvas.getContext('2d');
+    const exportAllBtn = document.getElementById('exportAllBtn');
+
+    const watermarkTypeRadios = document.querySelectorAll('input[name="watermarkType"]');
+    const textWatermarkOptions = document.getElementById('textWatermarkOptions');
+    const imageWatermarkOptions = document.getElementById('imageWatermarkOptions');
+
+    const watermarkTextInput = document.getElementById('watermarkText');
+    const fontSelect = document.getElementById('fontSelect');
+    const fontSizeSlider = document.getElementById('fontSize');
+    const fontSizeValue = document.getElementById('fontSizeValue');
+    const fontColorInput = document.getElementById('fontColor');
+
+    const watermarkImageUploadInput = document.getElementById('watermarkImageUpload');
+    const watermarkImagePreview = document.getElementById('watermarkImagePreview');
+
+    const opacitySlider = document.getElementById('opacitySlider');
+    const opacityValue = document.getElementById('opacityValue');
+    const sizeSlider = document.getElementById('sizeSlider');
+    const sizeValue = document.getElementById('sizeValue');
+    const rotationSlider = document.getElementById('rotationSlider');
+    const rotationValue = document.getElementById('rotationValue');
+    const positionXSlider = document.getElementById('positionXSlider');
+    const positionXValue = document.getElementById('positionXValue');
+    const positionYSlider = document.getElementById('positionYSlider');
+    const positionYValue = document.getElementById('positionYValue');
+
+    const presetSelect = document.getElementById('presetSelect');
+    const applyPresetBtn = document.getElementById('applyPresetBtn');
+    const savePresetBtn = document.getElementById('savePresetBtn');
+
+    // --- Application State ---
+    let uploadedImages = []; 
+    let currentImage = null; 
+
+    let watermark = {
+        type: 'text', 
+        text: 'Watermark Master',
+        font: "'Inter', sans-serif",
+        fontSize: 40,
+        fontColor: '#ffffff',
+        image: null, 
+        imageDataUrl: '', 
+        opacity: 0.5,
+        scale: 1,
+        rotation: 0, 
+        x: 0.5, 
+        y: 0.5,
+        renderedWidth: 0,
+        renderedHeight: 0,
+        isDragging: false,
+        dragStartX: 0, 
+        dragStartY: 0, 
+        initialWatermarkX: 0, 
+        initialWatermarkY: 0  
+    };
+
+    let presets = []; 
+
+    const LOCAL_STORAGE_KEY_PRESETS = 'watermarkMasterPresets';
+    const LOCAL_STORAGE_KEY_SETTINGS = 'watermarkMasterCurrentSettings';
+
+    function generateUniqueId() {
+        return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    // --- Persistence ---
+    function saveSettings() {
+        localStorage.setItem(LOCAL_STORAGE_KEY_SETTINGS, JSON.stringify({
+            watermark: {
+                type: watermark.type,
+                text: watermark.text,
+                font: watermark.font,
+                fontSize: watermark.fontSize,
+                fontColor: watermark.fontColor,
+                imageDataUrl: watermark.imageDataUrl,
+                opacity: watermark.opacity,
+                scale: watermark.scale,
+                rotation: watermark.rotation,
+                x: watermark.x,
+                y: watermark.y
+            },
+            currentImageId: currentImage ? currentImage.id : null
+        }));
+    }
+
+    function loadSettings() {
+        const storedSettings = localStorage.getItem(LOCAL_STORAGE_KEY_SETTINGS);
+        if (storedSettings) {
+            const { watermark: storedWatermark, currentImageId } = JSON.parse(storedSettings);
+            Object.assign(watermark, storedWatermark);
+
+            if (watermark.imageDataUrl) {
+                const img = new Image();
+                img.onload = () => {
+                    watermark.image = img;
+                    updateUI();
+                    drawCanvas();
+                };
+                img.src = watermark.imageDataUrl;
+                watermarkImagePreview.innerHTML = `<img src="${watermark.imageDataUrl}" alt="Watermark Preview">`;
+            }
+            updateUI();
+            return currentImageId;
+        }
+        return null;
+    }
+
+    function savePresets() {
+        localStorage.setItem(LOCAL_STORAGE_KEY_PRESETS, JSON.stringify(presets));
+        renderPresetOptions();
+    }
+
+    function loadPresets() {
+        const storedPresets = localStorage.getItem(LOCAL_STORAGE_KEY_PRESETS);
+        if (storedPresets) {
+            presets = JSON.parse(storedPresets);
+            renderPresetOptions();
+        }
+    }
+
+    function updateUI() {
+        watermarkTextInput.value = watermark.text;
+        fontSelect.value = watermark.font;
+        fontSizeSlider.value = watermark.fontSize;
+        fontSizeValue.textContent = `${watermark.fontSize}px`;
+        fontColorInput.value = watermark.fontColor;
+
+        opacitySlider.value = watermark.opacity;
+        opacityValue.textContent = `${Math.round(watermark.opacity * 100)}%`;
+        sizeSlider.value = watermark.scale;
+        sizeValue.textContent = `${Math.round(watermark.scale * 100)}%`;
+        rotationSlider.value = watermark.rotation;
+        rotationValue.textContent = `${watermark.rotation}°`;
+        positionXSlider.value = Math.round(watermark.x * 100);
+        positionXValue.textContent = `${Math.round(watermark.x * 100)}%`;
+        positionYSlider.value = Math.round(watermark.y * 100);
+        positionYValue.textContent = `${Math.round(watermark.y * 100)}%`;
+
+        watermarkTypeRadios.forEach(radio => {
+            radio.checked = radio.value === watermark.type;
+        });
+        toggleWatermarkTypeUI(watermark.type === 'text');
+
+        applyPresetBtn.disabled = !presetSelect.value;
+        exportAllBtn.disabled = uploadedImages.length === 0;
+    }
+
+    function toggleWatermarkTypeUI(isText) {
+        textWatermarkOptions.style.display = isText ? 'block' : 'none';
+        imageWatermarkOptions.style.display = isText ? 'none' : 'block';
+    }
+
+    function renderUploadedImages() {
+        uploadedImagesContainer.innerHTML = '';
+        uploadedImages.forEach(img => {
+            const div = document.createElement('div');
+            div.className = `thumbnail-item ${currentImage && currentImage.id === img.id ? 'selected' : ''}`;
+            div.dataset.id = img.id;
+            div.innerHTML = `<img src="${img.dataUrl}" alt="${img.name}">`;
+            div.addEventListener('click', () => selectImage(img.id));
+            uploadedImagesContainer.appendChild(div);
+        });
+    }
+
+    function renderPresetOptions() {
+        presetSelect.innerHTML = '<option value="">-- 选择已有预设 --</option>';
+        presets.forEach((preset, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = preset.name;
+            presetSelect.appendChild(option);
+        });
+        applyPresetBtn.disabled = !presetSelect.value;
+    }
+
+    function drawCanvas() {
+        if (!currentImage) {
+            const parentWidth = watermarkCanvas.parentElement.offsetWidth || 400;
+            watermarkCanvas.width = parentWidth;
+            watermarkCanvas.height = parentWidth / (16 / 9); 
+            ctx.clearRect(0, 0, watermarkCanvas.width, watermarkCanvas.height);
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(0, 0, watermarkCanvas.width, watermarkCanvas.height);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '500 14px Inter';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('请先上传或选择一张图片', watermarkCanvas.width / 2, watermarkCanvas.height / 2);
+            return;
+        }
+
+        watermarkCanvas.width = currentImage.imgElement.naturalWidth;
+        watermarkCanvas.height = currentImage.imgElement.naturalHeight;
+
+        ctx.clearRect(0, 0, watermarkCanvas.width, watermarkCanvas.height);
+        ctx.drawImage(currentImage.imgElement, 0, 0, watermarkCanvas.width, watermarkCanvas.height);
+
+        ctx.save();
+        ctx.globalAlpha = watermark.opacity;
+
+        const centerX = watermark.x * watermarkCanvas.width;
+        const centerY = watermark.y * watermarkCanvas.height;
+        ctx.translate(centerX, centerY);
+        ctx.rotate(watermark.rotation * Math.PI / 180);
+
+        if (watermark.type === 'text') {
+            ctx.font = `${watermark.fontSize * watermark.scale}px ${watermark.font}`;
+            ctx.fillStyle = watermark.fontColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(watermark.text, 0, 0);
+
+            const metrics = ctx.measureText(watermark.text);
+            watermark.renderedWidth = metrics.width;
+            watermark.renderedHeight = (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) || (watermark.fontSize * watermark.scale);
+        } else if (watermark.type === 'image' && watermark.image) {
+            const img = watermark.image;
+            watermark.renderedWidth = img.naturalWidth * watermark.scale;
+            watermark.renderedHeight = img.naturalHeight * watermark.scale;
+            ctx.drawImage(img, -watermark.renderedWidth / 2, -watermark.renderedHeight / 2, watermark.renderedWidth, watermark.renderedHeight);
+        }
+        ctx.restore();
+        saveSettings();
+    }
+
+    async function handleImageUpload(event) {
+        const files = Array.from(event.target.files);
+        for (const file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            const id = generateUniqueId();
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const dataUrl = e.target.result;
+                const img = new Image();
+                img.src = dataUrl;
+                await new Promise(resolve => img.onload = resolve);
+                uploadedImages.push({ id, name: file.name, dataUrl, imgElement: img });
+                renderUploadedImages();
+                if (!currentImage) selectImage(id);
+                exportAllBtn.disabled = uploadedImages.length === 0;
+            };
+            reader.readAsDataURL(file);
+        }
+        event.target.value = '';
+    }
+
+    function selectImage(id) {
+        const selected = uploadedImages.find(img => img.id === id);
+        if (selected) {
+            currentImage = selected;
+            renderUploadedImages();
+            drawCanvas();
+        }
+    }
+
+    function handleWatermarkImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+            watermark.image = null;
+            watermark.imageDataUrl = '';
+            watermarkImagePreview.innerHTML = '';
+            drawCanvas();
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            const img = new Image();
+            img.onload = () => {
+                watermark.image = img;
+                watermark.imageDataUrl = dataUrl;
+                watermarkImagePreview.innerHTML = `<img src="${dataUrl}" alt="Watermark Preview">`;
+                drawCanvas();
+            };
+            img.src = dataUrl;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleSavePreset() {
+        const presetName = prompt('为当前水印配置起个名字：');
+        if (presetName) {
+            presets.push({ 
+                name: presetName, 
+                settings: JSON.parse(JSON.stringify({
+                    type: watermark.type, text: watermark.text, font: watermark.font,
+                    fontSize: watermark.fontSize, fontColor: watermark.fontColor,
+                    imageDataUrl: watermark.imageDataUrl, opacity: watermark.opacity,
+                    scale: watermark.scale, rotation: watermark.rotation,
+                    x: watermark.x, y: watermark.y
+                }))
+            });
+            savePresets();
+        }
+    }
+
+    function handleApplyPreset() {
+        const selectedIndex = presetSelect.value;
+        if (selectedIndex !== '') {
+            const preset = presets[parseInt(selectedIndex)];
+            if (preset) {
+                Object.assign(watermark, JSON.parse(JSON.stringify(preset.settings)));
+                if (watermark.imageDataUrl) {
+                    const img = new Image();
+                    img.onload = () => {
+                        watermark.image = img;
+                        watermarkImagePreview.innerHTML = `<img src="${watermark.imageDataUrl}" alt="Watermark Preview">`;
+                        updateUI();
+                        drawCanvas();
+                    };
+                    img.src = watermark.imageDataUrl;
+                } else {
+                    watermark.image = null;
+                    watermarkImagePreview.innerHTML = '';
+                    updateUI();
+                    drawCanvas();
+                }
+            }
+        }
+    }
+
+    async function exportAll() {
+        if (uploadedImages.length === 0) return;
+        exportAllBtn.disabled = true;
+        const originalText = exportAllBtn.innerHTML;
+        exportAllBtn.textContent = '处理中...';
+
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        for (const imgData of uploadedImages) {
+            tempCanvas.width = imgData.imgElement.naturalWidth;
+            tempCanvas.height = imgData.imgElement.naturalHeight;
+            tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tempCtx.drawImage(imgData.imgElement, 0, 0, tempCanvas.width, tempCanvas.height);
+
+            tempCtx.save();
+            tempCtx.globalAlpha = watermark.opacity;
+            const centerX = watermark.x * tempCanvas.width;
+            const centerY = watermark.y * tempCanvas.height;
+            tempCtx.translate(centerX, centerY);
+            tempCtx.rotate(watermark.rotation * Math.PI / 180);
+
+            if (watermark.type === 'text') {
+                tempCtx.font = `${watermark.fontSize * watermark.scale}px ${watermark.font}`;
+                tempCtx.fillStyle = watermark.fontColor;
+                tempCtx.textAlign = 'center';
+                tempCtx.textBaseline = 'middle';
+                tempCtx.fillText(watermark.text, 0, 0);
+            } else if (watermark.type === 'image' && watermark.image) {
+                const w_img = watermark.image;
+                const w_width = w_img.naturalWidth * watermark.scale;
+                const w_height = w_img.naturalHeight * watermark.scale;
+                tempCtx.drawImage(w_img, -w_width / 2, -w_height / 2, w_width, w_height);
+            }
+            tempCtx.restore();
+
+            const dataURL = tempCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `wm_${imgData.name}`;
+            a.click();
+        }
+
+        exportAllBtn.disabled = false;
+        exportAllBtn.innerHTML = originalText;
+    }
+
+    function getCanvasMousePos(event) {
+        const rect = watermarkCanvas.getBoundingClientRect();
+        const scaleX = watermarkCanvas.width / rect.width;
+        const scaleY = watermarkCanvas.height / rect.height;
+        return {
+            x: (event.clientX - rect.left) * scaleX,
+            y: (event.clientY - rect.top) * scaleY
+        };
+    }
+
+    function isPointInWatermark(mouseX, mouseY) {
+        if (!currentImage) return false;
+        ctx.save();
+        const centerX = watermark.x * watermarkCanvas.width;
+        const centerY = watermark.y * watermarkCanvas.height;
+        ctx.translate(centerX, centerY);
+        ctx.rotate(watermark.rotation * Math.PI / 180);
+        
+        let w = watermark.renderedWidth;
+        let h = watermark.renderedHeight;
+        
+        ctx.beginPath();
+        ctx.rect(-w/2, -h/2, w, h);
+        const hit = ctx.isPointInPath(mouseX, mouseY);
+        ctx.restore();
+        return hit;
+    }
+
+    function handleCanvasMouseDown(event) {
+        if (!currentImage || event.button !== 0) return;
+        const mousePos = getCanvasMousePos(event);
+        if (isPointInWatermark(mousePos.x, mousePos.y)) {
+            watermark.isDragging = true;
+            watermarkCanvas.classList.add('dragging');
+            watermark.dragStartX = mousePos.x;
+            watermark.dragStartY = mousePos.y;
+            watermark.initialWatermarkX = watermark.x * watermarkCanvas.width;
+            watermark.initialWatermarkY = watermark.y * watermarkCanvas.height;
+        }
+    }
+
+    const debouncedDrawCanvas = debounce(drawCanvas, 5);
+
+    function handleCanvasMouseMove(event) {
+        if (!watermark.isDragging) return;
+        const mousePos = getCanvasMousePos(event);
+        const dx = mousePos.x - watermark.dragStartX;
+        const dy = mousePos.y - watermark.dragStartY;
+
+        let newPixelX = watermark.initialWatermarkX + dx;
+        let newPixelY = watermark.initialWatermarkY + dy;
+
+        watermark.x = newPixelX / watermarkCanvas.width;
+        watermark.y = newPixelY / watermarkCanvas.height;
+        
+        positionXSlider.value = Math.round(watermark.x * 100);
+        positionXValue.textContent = `${Math.round(watermark.x * 100)}%`;
+        positionYSlider.value = Math.round(watermark.y * 100);
+        positionYValue.textContent = `${Math.round(watermark.y * 100)}%`;
+
+        debouncedDrawCanvas();
+    }
+
+    function handleCanvasMouseUp() {
+        watermark.isDragging = false;
+        watermarkCanvas.classList.remove('dragging');
+    }
+
+    function setupEventListeners() {
+        imageUploadInput.addEventListener('change', handleImageUpload);
+        watermarkTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                watermark.type = e.target.value;
+                toggleWatermarkTypeUI(watermark.type === 'text');
+                drawCanvas();
+            });
+        });
+        watermarkTextInput.addEventListener('input', (e) => { watermark.text = e.target.value; drawCanvas(); });
+        fontSelect.addEventListener('change', (e) => { watermark.font = e.target.value; drawCanvas(); });
+        fontSizeSlider.addEventListener('input', (e) => {
+            watermark.fontSize = parseFloat(e.target.value);
+            fontSizeValue.textContent = `${watermark.fontSize}px`;
+            drawCanvas();
+        });
+        fontColorInput.addEventListener('input', (e) => { watermark.fontColor = e.target.value; drawCanvas(); });
+        watermarkImageUploadInput.addEventListener('change', handleWatermarkImageUpload);
+        opacitySlider.addEventListener('input', (e) => {
+            watermark.opacity = parseFloat(e.target.value);
+            opacityValue.textContent = `${Math.round(watermark.opacity * 100)}%`;
+            drawCanvas();
+        });
+        sizeSlider.addEventListener('input', (e) => {
+            watermark.scale = parseFloat(e.target.value);
+            sizeValue.textContent = `${Math.round(watermark.scale * 100)}%`;
+            drawCanvas();
+        });
+        rotationSlider.addEventListener('input', (e) => {
+            watermark.rotation = parseFloat(e.target.value);
+            rotationValue.textContent = `${watermark.rotation}°`;
+            drawCanvas();
+        });
+        positionXSlider.addEventListener('input', (e) => {
+            watermark.x = parseFloat(e.target.value) / 100;
+            positionXValue.textContent = `${Math.round(watermark.x * 100)}%`;
+            drawCanvas();
+        });
+        positionYSlider.addEventListener('input', (e) => {
+            watermark.y = parseFloat(e.target.value) / 100;
+            positionYValue.textContent = `${Math.round(watermark.y * 100)}%`;
+            drawCanvas();
+        });
+        savePresetBtn.addEventListener('click', handleSavePreset);
+        applyPresetBtn.addEventListener('click', handleApplyPreset);
+        exportAllBtn.addEventListener('click', exportAll);
+        watermarkCanvas.addEventListener('mousedown', handleCanvasMouseDown);
+        window.addEventListener('mousemove', handleCanvasMouseMove);
+        window.addEventListener('mouseup', handleCanvasMouseUp);
+        window.addEventListener('resize', () => drawCanvas());
+    }
+
+    function init() {
+        setupEventListeners();
+        loadPresets();
+        loadSettings();
+        updateUI();
+        drawCanvas();
+    }
+
+    init();
+</script>
+</body>
+</html>
