@@ -264,6 +264,11 @@ button:disabled {
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
     border-radius: 4px;
     cursor: grab;
+    transition: box-shadow 0.3s;
+}
+
+#watermarkCanvas:hover {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1), 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 
 #watermarkCanvas.dragging {
@@ -476,7 +481,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
         Watermark Master Pro
     </h1>
-    <div style="font-size: 0.75rem; opacity: 0.8;">V2.2 Professional Edition</div>
+    <div style="font-size: 0.75rem; opacity: 0.8;">V2.4 Interaction Pro</div>
 </header>
 
 <div class="app-container">
@@ -500,6 +505,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     </button>
                 </div>
             </div>
+            <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">提示：可直接 Ctrl+V 粘贴图片</p>
             <div id="uploadedImages" class="image-thumbnails"></div>
         </div>
 
@@ -526,7 +532,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     <section class="canvas-editor">
         <div class="canvas-toolbar">
             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">实时编辑预览</span>
-            <span style="font-size: 0.7rem; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">抓取并拖动水印位置</span>
+            <span id="interactionHint" style="font-size: 0.7rem; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">点击上传图片</span>
         </div>
         <div class="canvas-wrapper">
             <canvas id="watermarkCanvas"></canvas>
@@ -627,6 +633,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <input type="range" id="positionYSlider" min="0" max="100" value="50">
                 <span class="value-badge" id="positionYValue">50%</span>
             </div>
+            
+            <button id="resetPositionBtn" class="btn-secondary" style="width: 100%; margin-top: 1rem; font-size: 0.75rem;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v1m0 14v1m8-8h-1M5 12H4m12.728-4.243l-.707.707M6.979 17.021l-.707.707m10.607 0l-.707-.707M6.272 6.272l.707.707M12 12a3 3 0 100-6 3 3 0 000 6z"/></svg>
+                重置水印位置
+            </button>
         </fieldset>
     </aside>
 </div>
@@ -638,6 +649,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
     const deselectAllBtn = document.getElementById('deselectAllBtn');
     const watermarkCanvas = document.getElementById('watermarkCanvas');
+    const interactionHint = document.getElementById('interactionHint');
     const ctx = watermarkCanvas.getContext('2d');
     const exportAllBtn = document.getElementById('exportAllBtn');
 
@@ -674,6 +686,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     const presetList = document.getElementById('presetList');
     const savePresetBtn = document.getElementById('savePresetBtn');
+    const resetPositionBtn = document.getElementById('resetPositionBtn');
 
     // --- State ---
     let uploadedImages = []; 
@@ -781,6 +794,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         const hasSelection = selectedImageIds.size > 0;
         deleteSelectedBtn.style.display = hasSelection ? 'inline-flex' : 'none';
         deselectAllBtn.style.display = hasSelection ? 'inline-flex' : 'none';
+
+        // 更新提示语
+        interactionHint.textContent = currentImage ? '抓取拖动 · 双击空白上传' : '点击区域上传图片';
     }
 
     function toggleWatermarkTypeUI(isText) {
@@ -882,7 +898,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             ctx.fillStyle = '#94a3b8';
             ctx.font = '14px Inter';
             ctx.textAlign = 'center';
-            ctx.fillText('请先上传或选择一张图片', watermarkCanvas.width/2, watermarkCanvas.height/2);
+            ctx.fillText('请先上传或选择一张图片 (点击此处)', watermarkCanvas.width/2, watermarkCanvas.height/2);
             return;
         }
 
@@ -908,8 +924,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 
     // --- Image Handlers ---
-    async function handleImageUpload(e) {
-        const files = Array.from(e.target.files);
+    async function processFiles(files) {
         for (const file of files) {
             if (!file.type.startsWith('image/')) continue;
             const reader = new FileReader();
@@ -918,12 +933,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                 img.src = event.target.result;
                 await new Promise(r => img.onload = r);
                 const id = generateUniqueId();
-                uploadedImages.push({ id, name: file.name, dataUrl: event.target.result, imgElement: img });
+                uploadedImages.push({ id, name: file.name || 'pasted-image.png', dataUrl: event.target.result, imgElement: img });
                 renderUploadedImages();
                 if (!currentImage) selectImage(id);
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    async function handleImageUpload(e) {
+        processFiles(Array.from(e.target.files));
+        e.target.value = '';
     }
 
     function renderUploadedImages() {
@@ -1044,6 +1064,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     function handleMouseDown(e) {
         if (!currentImage || e.button !== 0) return;
+        
         watermark.isDragging = true;
         watermarkCanvas.classList.add('dragging');
         const pos = getMouse(e);
@@ -1104,7 +1125,40 @@ input:checked + .slider:before { transform: translateX(20px); }
                 renderPresetList();
             }
         };
+        
+        resetPositionBtn.onclick = () => {
+            watermark.x = 0.5;
+            watermark.y = 0.5;
+            updateUI();
+            drawCanvas();
+        };
+
         exportAllBtn.onclick = exportAll;
+
+        // 剪贴板粘贴支持
+        window.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            const files = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    files.push(items[i].getAsFile());
+                }
+            }
+            if (files.length > 0) processFiles(files);
+        });
+
+        // 交互逻辑修改：未上传时单击上传，已上传时双击上传
+        watermarkCanvas.onclick = (e) => {
+            if (!currentImage) {
+                imageUploadInput.click();
+            }
+        };
+
+        watermarkCanvas.ondblclick = (e) => {
+            if (currentImage) {
+                imageUploadInput.click();
+            }
+        };
 
         watermarkCanvas.onmousedown = handleMouseDown;
         window.onmousemove = handleMouseMove;
